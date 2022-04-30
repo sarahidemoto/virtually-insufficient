@@ -1,0 +1,57 @@
+import processing.serial.*;
+
+
+import oscP5.*;
+import netP5.*;
+
+OscP5 oscP5;
+NetAddress myRemoteLocation;
+
+
+Serial myPort;
+
+float rx, ry, rz, resetx, resety, resetz;
+void setup() {
+
+  myPort = new Serial( this, Serial.list()[6], 115200 );
+  myPort.clear();
+  
+  oscP5 = new OscP5(this, 9000);
+
+  myRemoteLocation = new NetAddress("127.0.0.1", 6969);
+}
+
+void draw() {
+  background(0);
+  while ( myPort.available () > 0 ) {
+    String data = myPort.readStringUntil( '\n' );
+    if ( data != null ) {
+      String[] tmp = splitTokens(data, ";");
+      if (tmp.length > 4) {
+        rx = parseFloat(tmp[3]);
+        ry = parseFloat(tmp[4]);
+        rz = parseFloat(tmp[5]);
+        println("rw : " + rx); //debug
+        if (millis() > 20000 && millis() <30000) {
+          text("Initialisation : ok", 10, height-10);
+          resetx= rx;
+          resety=ry;
+          resetz=rz;
+        }
+      }
+    }
+  }
+
+  OscMessage cubeX = new OscMessage("/CubeX");
+  cubeX.add(rx);
+  oscP5.send(cubeX, myRemoteLocation);
+  
+  OscMessage cubeY = new OscMessage("/CubeY");
+  cubeY.add(ry);
+  oscP5.send(cubeY, myRemoteLocation);
+  
+  OscMessage cubeZ = new OscMessage("/CubeZ");
+  cubeZ.add(rz);
+  oscP5.send(cubeZ, myRemoteLocation);
+  
+}
