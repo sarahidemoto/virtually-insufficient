@@ -1,0 +1,27 @@
+using UnityEngine;
+using System.Collections;
+
+public class ReceivePosition : MonoBehaviour {
+ 
+   	public OSC osc;
+	void Start () {
+       osc.SetAddressHandler("/CubeY", OnReceiveY);
+       osc.SetAddressHandler("/CubeZ", OnReceiveZ);
+    }
+	void Update () {
+	}
+    void OnReceiveY(OscMessage message) {
+        float y = message.GetFloat(0);
+        Vector3 position = transform.position;
+        y = y / -10;
+        position.x = y;
+        transform.position = position;
+    }
+    void OnReceiveZ(OscMessage message) {
+        float z = message.GetFloat(0);]
+        Vector3 position = transform.position;
+        z = z / -10;
+        position.z = z;
+        transform.position = position;
+    }
+}
